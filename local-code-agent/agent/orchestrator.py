@@ -1,6 +1,7 @@
 from agent.agents import code_reader, code_writer, tester, debugger, planner
 from agent.tools import execute_tool, search_code, read_file, list_directory, get_code_structure, run_command
 from agent.execution import execute_agent_loop
+from agent.utils import extract_json_from_text
 import json
 
 class Orchestrator:
@@ -52,15 +53,10 @@ class Orchestrator:
         try:
             response = planner(query)
             text = response.text
-            # Try to extract JSON from text (sometimes LLMs wrap in ```json ... ```)
-            if "```json" in text:
-                text = text.split("```json")[1].split("```")[0]
-            elif "```" in text:
-                text = text.split("```")[1].split("```")[0]
 
-            try:
-                plan = json.loads(text.strip())
-            except json.JSONDecodeError:
+            plan = extract_json_from_text(text)
+
+            if plan is None:
                 # Retry or cleanup
                 print(f"Planner output invalid JSON: {text}")
                 return [{"agent": self.choose_agent_fallback(query), "task": query}]
