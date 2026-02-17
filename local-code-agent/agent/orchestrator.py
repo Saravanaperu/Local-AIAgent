@@ -1,5 +1,6 @@
 from agent.agents import code_reader, code_writer, tester, debugger, planner
 from agent.tools import execute_tool, search_code, read_file, list_directory, get_code_structure, run_command
+from google.ai.generativelanguage import Part, FunctionResponse
 import json
 
 class Orchestrator:
@@ -135,12 +136,9 @@ class Orchestrator:
                 # Construct function response
                 history.append({
                     "role": "function",
-                    "parts": [{
-                        "function_response": {
-                            "name": tool_name,
-                            "response": {"result": result}
-                        }
-                    }]
+                    "parts": [
+                        Part(function_response=FunctionResponse(name=tool_name, response={"result": result}))
+                    ]
                 })
 
             elif hasattr(part, 'text') and part.text:
