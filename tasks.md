@@ -8,6 +8,7 @@
 - [x] Task 6: Add User Interaction and Safety Confirmations <!-- id: 6 -->
 - [x] Task 7: Testing and Debugging <!-- id: 7 -->
 - [x] Task 8: Documentation and Usage Instructions <!-- id: 8 -->
+- [x] Task 9: Security Fix: Insecure Default API Key <!-- id: 9 -->
 
 ## Task Status
 - Task 1: Completed
@@ -18,3 +19,4 @@
 - Task 6: Completed
 - Task 7: Completed
 - Task 8: In Progress
+- Task 9: Completed
