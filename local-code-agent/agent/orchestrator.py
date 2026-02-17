@@ -1,6 +1,6 @@
 from agent.agents import code_reader, code_writer, tester, debugger, planner
 from agent.tools import execute_tool, search_code, read_file, list_directory, get_code_structure, run_command
-from google.ai.generativelanguage import Part, FunctionResponse
+from agent.execution import execute_agent_loop
 import json
 
 class Orchestrator:
@@ -107,50 +107,26 @@ class Orchestrator:
         if context_str:
             task = f"{task}\n\nContext from previous steps:\n{context_str}"
 
-        for i in range(max_iterations):
-            try:
-                response = agent_fn(task, history)
-            except Exception as e:
-                return f"Error calling agent: {e}"
+        def get_response_fn(hist):
+            return agent_fn(task, hist)
 
-            if not response.parts:
-                 return "Error: Empty response from agent."
-
-            part = response.parts[0]
-
-            if hasattr(part, 'function_call') and part.function_call:
-                fc = part.function_call
-                tool_name = fc.name
-                tool_args = dict(fc.args)
-
-                print(f"  Agent calls tool: {tool_name} with {tool_args}")
-
-                if tool_name == "ask_orchestrator":
-                    result = self.handle_orchestrator_request(tool_args)
-                else:
-                    result = execute_tool(tool_name, tool_args)
-
-                # Update history
-                history.append(response.candidates[0].content)
-
-                # Construct function response
-                history.append({
-                    "role": "function",
-                    "parts": [
-                        Part(function_response=FunctionResponse(name=tool_name, response={"result": result}))
-                    ]
-                })
-
-            elif hasattr(part, 'text') and part.text:
-                return part.text
+        def tool_executor(name, args):
+            if name == "ask_orchestrator":
+                return self.handle_orchestrator_request(args)
             else:
-                 try:
-                    text = response.text
-                    return text
-                 except:
-                    return "Error: Unexpected response format."
+                return execute_tool(name, args)
 
-        return "Agent did not finish within iteration limit."
+        # Simple logging wrapper to match previous style roughly
+        def log_func(msg):
+            print(f"  {msg}")
+
+        return execute_agent_loop(
+            get_response_fn,
+            history,
+            tool_executor,
+            max_iterations=max_iterations,
+            log_func=log_func
+        )
 
     def handle_orchestrator_request(self, args):
         action = args.get("action")
