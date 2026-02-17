@@ -4,6 +4,7 @@ from google.ai.generativelanguage import FunctionDeclaration, Tool, Schema, Type
 import config
 from agent.tools import TOOL_FUNCTIONS, execute_tool, search_code
 from agent.tool_schemas import TOOL_SCHEMAS
+from agent.execution import execute_agent_loop
 
 def get_tool_schemas():
     return [Tool(function_declarations=[
@@ -71,62 +72,10 @@ Always think step by step. Use tools to gather information. When you have enough
     # Add user query
     history.append({"role": "user", "parts": [user_query]})
 
-    max_iterations = 10
-
-    for i in range(max_iterations):
-        print(f"Iteration {i+1}/{max_iterations}")
-        try:
-            response = call_gemini_with_history(history)
-        except Exception as e:
-            return f"Error calling Gemini: {e}"
-
-        # Check for function calls
-        # response.parts is a list of Part objects.
-        if not response.parts:
-            return "Error: Empty response from Gemini."
-
-        part = response.parts[0]
-
-        # Check if function call
-        if hasattr(part, 'function_call') and part.function_call:
-            fc = part.function_call
-            tool_name = fc.name
-            tool_args = dict(fc.args)
-
-            print(f"Agent: Calling tool {tool_name} with args {tool_args}")
-
-            # Append model's tool call to history
-            # Use the Content object from response
-            history.append(response.candidates[0].content)
-
-            # Execute tool
-            result = execute_tool(tool_name, tool_args)
-            print(f"Tool Result: {result[:200]}..." if len(result) > 200 else f"Tool Result: {result}")
-
-            # Append tool response to history
-            func_response_part = Part(
-                function_response=FunctionResponse(
-                    name=tool_name,
-                    response={"result": result}
-                )
-            )
-
-            # Use Content object for consistency if possible, or dict
-            # 'function' role is standard for tool outputs in this SDK context?
-            # Actually SDK often uses 'function' role.
-            history.append({"role": "function", "parts": [func_response_part]})
-
-        elif hasattr(part, 'text') and part.text:
-            # Final answer
-            history.append(response.candidates[0].content)
-            return part.text
-        else:
-            # Fallback for text if part.text is missing but it's text
-             try:
-                text = response.text
-                history.append(response.candidates[0].content)
-                return text
-             except:
-                return "Error: Unexpected response format."
-
-    return "Agent: Maximum iterations reached without final answer."
+    return execute_agent_loop(
+        call_gemini_with_history,
+        history,
+        execute_tool,
+        max_iterations=10,
+        log_func=print
+    )
