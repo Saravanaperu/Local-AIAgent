@@ -17,8 +17,8 @@ def get_tool_schemas():
     ])]
 
 def get_model():
-    if not config.GEMINI_API_KEY or config.GEMINI_API_KEY == "YOUR_API_KEY_HERE":
-        print("Warning: GEMINI_API_KEY is not set. Please set it in config.py or environment variables.")
+    if not config.GEMINI_API_KEY:
+        raise ValueError("GEMINI_API_KEY is not set. Please set it as an environment variable.")
 
     genai.configure(api_key=config.GEMINI_API_KEY)
 
