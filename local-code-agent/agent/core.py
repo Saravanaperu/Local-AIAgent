@@ -3,98 +3,17 @@ import google.generativeai as genai
 from google.ai.generativelanguage import FunctionDeclaration, Tool, Schema, Type, Part, FunctionResponse, Content
 import config
 from agent.tools import TOOL_FUNCTIONS, execute_tool, search_code
+from agent.tool_schemas import TOOL_SCHEMAS
 
 def get_tool_schemas():
-    search_code_func = FunctionDeclaration(
-        name="search_code",
-        description="Search the codebase for relevant code snippets using semantic search.",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "query": Schema(type=Type.STRING, description="The natural language search query.")
-            },
-            required=["query"]
-        )
-    )
-
-    read_file_func = FunctionDeclaration(
-        name="read_file",
-        description="Read the content of a file.",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "path": Schema(type=Type.STRING, description="The path to the file to read.")
-            },
-            required=["path"]
-        )
-    )
-
-    write_file_func = FunctionDeclaration(
-        name="write_file",
-        description="Write content to a file. Overwrites if exists (creates backup).",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "path": Schema(type=Type.STRING, description="The path to the file to write."),
-                "content": Schema(type=Type.STRING, description="The content to write.")
-            },
-            required=["path", "content"]
-        )
-    )
-
-    run_command_func = FunctionDeclaration(
-        name="run_command",
-        description="Run a shell command (whitelisted: pytest, git, python, npm, node, make).",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "command": Schema(type=Type.STRING, description="The command to run.")
-            },
-            required=["command"]
-        )
-    )
-
-    list_directory_func = FunctionDeclaration(
-        name="list_directory",
-        description="List files and directories in a given path.",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "path": Schema(type=Type.STRING, description="The directory path to list.")
-            },
-            required=["path"]
-        )
-    )
-
-    get_code_structure_func = FunctionDeclaration(
-        name="get_code_structure",
-        description="Get a tree-like view of the project structure.",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={},
-        )
-    )
-
-    ask_user_func = FunctionDeclaration(
-        name="ask_user",
-        description="Ask the user for input or clarification.",
-        parameters=Schema(
-            type=Type.OBJECT,
-            properties={
-                "question": Schema(type=Type.STRING, description="The question to ask the user.")
-            },
-            required=["question"]
-        )
-    )
-
     return [Tool(function_declarations=[
-        search_code_func,
-        read_file_func,
-        write_file_func,
-        run_command_func,
-        list_directory_func,
-        get_code_structure_func,
-        ask_user_func
+        TOOL_SCHEMAS["search_code"],
+        TOOL_SCHEMAS["read_file"],
+        TOOL_SCHEMAS["write_file"],
+        TOOL_SCHEMAS["run_command"],
+        TOOL_SCHEMAS["list_directory"],
+        TOOL_SCHEMAS["get_code_structure"],
+        TOOL_SCHEMAS["ask_user"]
     ])]
 
 def get_model():

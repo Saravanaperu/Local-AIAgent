@@ -1,4 +1,4 @@
-from agent.core import run_agent
+from agent.orchestrator import Orchestrator
 import sys
 
 if __name__ == "__main__":
@@ -8,6 +8,9 @@ if __name__ == "__main__":
         query = input("Ask me about your codebase: ")
 
     print(f"Query: {query}")
-    answer = run_agent(query)
+
+    orchestrator = Orchestrator()
+    answer = orchestrator.run(query)
+
     print("\n=== Agent Answer ===\n")
     print(answer)

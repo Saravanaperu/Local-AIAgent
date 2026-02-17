@@ -134,6 +134,15 @@ def ask_user(question: str) -> str:
     print(f"Agent asks: {question}")
     return input("Your answer: ")
 
+def ask_orchestrator(action: str, **kwargs) -> str:
+    """
+    Ask the orchestrator for something. This tool should be intercepted by the orchestrator.
+    The request should be a JSON string with fields 'action' and other parameters.
+    """
+    # This function will never be called directly; it's just a placeholder.
+    # The orchestrator will detect its name and handle it.
+    raise NotImplementedError("This tool must be handled by the orchestrator.")
+
 TOOL_FUNCTIONS = {
     "search_code": search_code,
     "read_file": read_file,
@@ -141,7 +150,8 @@ TOOL_FUNCTIONS = {
     "run_command": run_command,
     "list_directory": list_directory,
     "get_code_structure": get_code_structure,
-    "ask_user": ask_user
+    "ask_user": ask_user,
+    "ask_orchestrator": ask_orchestrator
 }
 
 def execute_tool(name: str, args: dict) -> str:
