@@ -1,7 +1,7 @@
 import os
 import sys
 import chromadb
-from sentence_transformers import SentenceTransformer
+from agent.embedding import get_embedding_model
 from tree_sitter_languages import get_language, get_parser
 import config
 
@@ -10,7 +10,7 @@ chroma_client = chromadb.PersistentClient(path=config.CHROMA_PERSIST_DIR)
 # Initialize embedding model
 # Load model once
 print("Loading embedding model...")
-embedding_model = SentenceTransformer(config.EMBEDDING_MODEL)
+embedding_model = get_embedding_model(config.EMBEDDING_MODEL)
 
 collection = chroma_client.get_or_create_collection(name="code_chunks")
 
@@ -144,7 +144,7 @@ def index_codebase(directory):
                     ids = [c["id"] for c in chunks]
                     documents = [c["text"] for c in chunks]
                     metadatas = [c["metadata"] for c in chunks]
-                    embeddings = [embedding_model.encode(doc).tolist() for doc in documents]
+                    embeddings = [embedding_model.encode(doc, task_type="retrieval_document").tolist() for doc in documents]
 
                     collection.upsert(
                         ids=ids,
@@ -154,7 +154,7 @@ def index_codebase(directory):
                     )
 
 def search_code(query, n_results=5):
-    query_embedding = embedding_model.encode(query).tolist()
+    query_embedding = embedding_model.encode(query, task_type="retrieval_query").tolist()
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results
