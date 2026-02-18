@@ -1,6 +1,6 @@
 import os
 
-PROJECT_ROOT = os.path.abspath(".")  # Will be overridden by user input later
+PROJECT_ROOT = os.environ.get("PROJECT_ROOT", os.path.abspath("."))
 CHROMA_PERSIST_DIR = "./chroma_db"
 EMBEDDING_MODEL = "models/text-embedding-004"
 
