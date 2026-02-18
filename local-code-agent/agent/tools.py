@@ -141,7 +141,7 @@ def ask_orchestrator(action: str, **kwargs) -> str:
     """
     # This function will never be called directly; it's just a placeholder.
     # The orchestrator will detect its name and handle it.
-    raise NotImplementedError("This tool must be handled by the orchestrator.")
+    return "Error: This tool is only available when running under the Orchestrator."
 
 TOOL_FUNCTIONS = {
     "search_code": search_code,
