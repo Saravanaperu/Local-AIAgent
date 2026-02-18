@@ -6,9 +6,15 @@ import sys
 mock_np = MagicMock()
 sys.modules["numpy"] = mock_np
 
+# Mock google
+mock_google = MagicMock()
+sys.modules["google"] = mock_google
+
 # Mock google.generativeai
 mock_genai = MagicMock()
 sys.modules["google.generativeai"] = mock_genai
+# Ensure mock_google.generativeai points to the same mock
+mock_google.generativeai = mock_genai
 
 # Mock sentence_transformers
 mock_sentence_transformers = MagicMock()
