@@ -3,6 +3,7 @@ from agent.tools import execute_tool, search_code, read_file, list_directory, ge
 from agent.execution import execute_agent_loop
 from agent.utils import extract_json_from_text
 import json
+import traceback
 
 class Orchestrator:
     def __init__(self):
@@ -69,7 +70,7 @@ class Orchestrator:
                 print(f"Planner output not a list or dict: {plan}")
                 return [{"agent": self.choose_agent_fallback(query), "task": query}]
         except Exception as e:
-            print(f"Planner failed: {e}")
+            print(f"Planner failed: {e}\n{traceback.format_exc()}")
             return [{"agent": self.choose_agent_fallback(query), "task": query}]
 
     def choose_agent_fallback(self, query):
