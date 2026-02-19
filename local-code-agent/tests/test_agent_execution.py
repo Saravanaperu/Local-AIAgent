@@ -34,6 +34,9 @@ sys.modules["google.ai.generativelanguage"] = mock_generativelanguage
 
 # Add local-code-agent to path
 import os
+# Set dummy API key for testing
+os.environ["GEMINI_API_KEY"] = "fake_key_for_test"
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.insert(0, project_root)
