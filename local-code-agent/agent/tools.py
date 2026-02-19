@@ -2,6 +2,7 @@ import os
 import subprocess
 import shutil
 import datetime
+import shlex
 from agent import indexer, utils
 
 ALLOWED_COMMANDS = ["pytest", "git", "python", "npm", "node", "make"]
@@ -63,7 +64,11 @@ def write_file(path: str, content: str) -> str:
         return f"Error writing file {path}: {e}"
 
 def run_command(command: str) -> str:
-    parts = command.split()
+    try:
+        parts = shlex.split(command)
+    except ValueError:
+        return "Error: Could not parse command."
+
     if not parts:
         return "Error: Empty command."
 
@@ -80,8 +85,8 @@ def run_command(command: str) -> str:
 
     try:
         result = subprocess.run(
-            command,
-            shell=True,
+            parts,
+            shell=False,
             cwd=utils.get_project_root(),
             capture_output=True,
             text=True,

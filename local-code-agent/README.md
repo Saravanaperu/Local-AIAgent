@@ -4,7 +4,7 @@ A custom AI agent that can understand, query, and modify your local codebase usi
 
 ## Features
 
-- **Code Indexing**: Parses and indexes your code (Python, JS, etc.) using Tree-sitter and ChromaDB for semantic search.
+- **Code Indexing**: Parses and indexes your code (Python, JS, TS, Java, C++, C, etc.) using Tree-sitter and ChromaDB for semantic search.
 - **Smart Tools**: Can search code, read/write files, list directories, and run shell commands.
 - **Safety First**: Asks for confirmation before modifying files or running commands. Creates backups before writing.
 - **ReAct Loop**: Uses Gemini to reason step-by-step and solve complex tasks.
@@ -66,7 +66,7 @@ A custom AI agent that can understand, query, and modify your local codebase usi
 - `read_file(path)`: Read file content.
 - `write_file(path, content)`: Write file (with confirmation and backup).
 - `list_directory(path)`: List files in a directory.
-- `run_command(command)`: Run shell commands (whitelisted: pytest, git, python, npm, node, make).
+- `run_command(command)`: Run shell commands (whitelisted: pytest, git, python, npm, node, make). Secure execution without shell.
 - `get_code_structure()`: Get a tree view of the project.
 - `ask_user(question)`: Ask the user for input.
 

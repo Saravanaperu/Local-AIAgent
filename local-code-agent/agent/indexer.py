@@ -66,9 +66,19 @@ def extract_chunks(file_path):
         (class_declaration) @class
         (method_definition) @method
         """
+    elif ext == ".java":
+        query_scm = """
+        (method_declaration) @function
+        (class_declaration) @class
+        """
+    elif ext in [".cpp", ".c", ".h"]:
+        query_scm = """
+        (function_definition) @function
+        (class_specifier) @class
+        (struct_specifier) @struct
+        """
     else:
-        # For other languages, just whole file or basic blocks if needed
-        # We can expand this later
+        # Fallback for other supported languages or unexpected ones
         chunks.append({
             "id": f"{file_path}:0",
             "text": content,
@@ -144,7 +154,7 @@ def index_codebase(directory):
                     ids = [c["id"] for c in chunks]
                     documents = [c["text"] for c in chunks]
                     metadatas = [c["metadata"] for c in chunks]
-                    embeddings = [embedding_model.encode(doc, task_type="retrieval_document").tolist() for doc in documents]
+                    embeddings = embedding_model.encode(documents, task_type="retrieval_document").tolist()
 
                     collection.upsert(
                         ids=ids,
