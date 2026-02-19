@@ -66,10 +66,9 @@ class TestEmbedding(unittest.TestCase):
         )
 
     def test_gemini_embedder_encode_list(self):
-        mock_genai.embed_content.side_effect = [
-            {"embedding": [0.1, 0.1]},
-            {"embedding": [0.2, 0.2]}
-        ]
+        mock_genai.embed_content.return_value = {
+            "embedding": [[0.1, 0.1], [0.2, 0.2]]
+        }
         embedder = GeminiEmbedder("models/test")
         result = embedder.encode(["doc1", "doc2"], task_type="retrieval_query")
 
@@ -77,17 +76,11 @@ class TestEmbedding(unittest.TestCase):
         self.assertEqual(result, expected)
 
         # Verify calls
-        self.assertEqual(mock_genai.embed_content.call_count, 2)
+        self.assertEqual(mock_genai.embed_content.call_count, 1)
 
         calls = mock_genai.embed_content.call_args_list
-        # call is a tuple (args, kwargs)
-        # but in python 3.8+ call object has kwargs attribute
-        # mock_genai.embed_content.call_args_list returns a list of 'Call' objects
-        # accessing kwargs attribute should work
-        self.assertEqual(calls[0].kwargs['content'], "doc1")
+        self.assertEqual(calls[0].kwargs['content'], ["doc1", "doc2"])
         self.assertEqual(calls[0].kwargs['task_type'], "retrieval_query")
-        self.assertEqual(calls[1].kwargs['content'], "doc2")
-        self.assertEqual(calls[1].kwargs['task_type'], "retrieval_query")
 
     def test_sentence_transformer_embedder_encode(self):
         mock_model = MagicMock()

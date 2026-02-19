@@ -26,15 +26,12 @@ class GeminiEmbedder:
             return np.array(result['embedding'])
         elif isinstance(content, list):
             # Batch embedding
-            embeddings = []
-            for item in content:
-                result = genai.embed_content(
-                    model=self.model_name,
-                    content=item,
-                    task_type=task_type
-                )
-                embeddings.append(result['embedding'])
-            return np.array(embeddings)
+            result = genai.embed_content(
+                model=self.model_name,
+                content=content,
+                task_type=task_type
+            )
+            return np.array(result['embedding'])
         else:
             raise ValueError("Content must be a string or a list of strings.")
 
