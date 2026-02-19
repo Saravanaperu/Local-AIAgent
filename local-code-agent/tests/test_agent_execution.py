@@ -19,8 +19,14 @@ class MockFunctionResponse:
         self.name = name
         self.response = response
 
+class MockContent:
+    def __init__(self, role=None, parts=None):
+        self.role = role
+        self.parts = parts
+
 mock_generativelanguage.Part = MockPart
 mock_generativelanguage.FunctionResponse = MockFunctionResponse
+mock_generativelanguage.Content = MockContent
 
 sys.modules["google"] = mock_google
 sys.modules["google.ai"] = mock_genai
@@ -94,10 +100,11 @@ class TestExecuteAgentLoop(unittest.TestCase):
         # 3. Final Answer Content
         self.assertEqual(len(self.history), 3)
         self.assertEqual(self.history[0], "Tool Call Content")
-        self.assertEqual(self.history[1]["role"], "function")
-        self.assertIsInstance(self.history[1]["parts"][0], MockPart)
-        self.assertEqual(self.history[1]["parts"][0].function_response.name, "my_tool")
-        self.assertEqual(self.history[1]["parts"][0].function_response.response, {"result": "Tool Output"})
+        self.assertIsInstance(self.history[1], MockContent)
+        self.assertEqual(self.history[1].role, "function")
+        self.assertIsInstance(self.history[1].parts[0], MockPart)
+        self.assertEqual(self.history[1].parts[0].function_response.name, "my_tool")
+        self.assertEqual(self.history[1].parts[0].function_response.response, {"result": "Tool Output"})
         self.assertEqual(self.history[2], "Final Answer Content")
 
     def test_max_iterations(self):
