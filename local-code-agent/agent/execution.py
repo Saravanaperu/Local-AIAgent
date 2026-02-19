@@ -1,5 +1,5 @@
 import json
-from google.ai.generativelanguage import Part, FunctionResponse
+from google.ai.generativelanguage import Content, Part, FunctionResponse
 
 def execute_agent_loop(
     get_response_fn,
@@ -63,8 +63,8 @@ def execute_agent_loop(
                 )
             )
 
-            # Append as a dict with role 'function'
-            history.append({"role": "function", "parts": [func_response_part]})
+            # Append as a Content object with role 'function'
+            history.append(Content(role="function", parts=[func_response_part]))
 
         elif hasattr(part, 'text') and part.text:
             # Final answer
