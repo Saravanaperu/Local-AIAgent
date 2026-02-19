@@ -145,23 +145,30 @@ def index_codebase(directory):
         # Ignore hidden directories and venv
         dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['venv', '__pycache__', 'chroma_db', 'site-packages']]
 
+        dir_chunks = []
         for file in files:
             if file.endswith(('.py', '.js', '.ts', '.java', '.cpp', '.h', '.c')):
                 file_path = os.path.join(root, file)
-                # print(f"Indexing {file_path}...")
                 chunks = extract_chunks(file_path)
-                if chunks:
-                    ids = [c["id"] for c in chunks]
-                    documents = [c["text"] for c in chunks]
-                    metadatas = [c["metadata"] for c in chunks]
-                    embeddings = embedding_model.encode(documents, task_type="retrieval_document").tolist()
+                dir_chunks.extend(chunks)
 
-                    collection.upsert(
-                        ids=ids,
-                        documents=documents,
-                        metadatas=metadatas,
-                        embeddings=embeddings
-                    )
+        if dir_chunks:
+            # Batch encoding and upserting for the whole directory
+            # Using a batch size of 100 to stay within common API limits
+            batch_size = 100
+            for i in range(0, len(dir_chunks), batch_size):
+                batch = dir_chunks[i:i + batch_size]
+                ids = [c["id"] for c in batch]
+                documents = [c["text"] for c in batch]
+                metadatas = [c["metadata"] for c in batch]
+                embeddings = embedding_model.encode(documents, task_type="retrieval_document").tolist()
+
+                collection.upsert(
+                    ids=ids,
+                    documents=documents,
+                    metadatas=metadatas,
+                    embeddings=embeddings
+                )
 
 def search_code(query, n_results=5):
     query_embedding = embedding_model.encode(query, task_type="retrieval_query").tolist()
