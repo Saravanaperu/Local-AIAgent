@@ -43,6 +43,9 @@ def extract_chunks(file_path):
         return []
 
     try:
+        if os.path.getsize(file_path) > config.MAX_FILE_SIZE:
+            print(f"Warning: Skipping file {file_path} because it exceeds the maximum size of {config.MAX_FILE_SIZE} bytes.")
+            return []
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
     except Exception as e:
