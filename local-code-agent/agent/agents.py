@@ -14,9 +14,6 @@ def create_agent(system_prompt, tool_names):
     # Only create tools object if there are declarations
     tools = [Tool(function_declarations=tool_declarations)] if tool_declarations else None
 
-    if not config.GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY is not set. Please set it as an environment variable.")
-
     genai.configure(api_key=config.GEMINI_API_KEY)
 
     model = genai.GenerativeModel(model_name=config.GEMINI_MODEL, tools=tools)
