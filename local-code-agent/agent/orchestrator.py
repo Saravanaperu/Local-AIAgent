@@ -156,7 +156,9 @@ class Orchestrator:
         return "\n".join(summary)
 
     def synthesize_answer(self):
-        summary = "Mission Completed.\n\n"
-        for step_id, result in self.state["results"].items():
-            summary += f"=== Step {step_id} ===\n{result}\n\n"
-        return summary
+        parts = ["Mission Completed.\n\n"]
+        parts.extend(
+            f"=== Step {step_id} ===\n{result}\n\n"
+            for step_id, result in self.state["results"].items()
+        )
+        return "".join(parts)
