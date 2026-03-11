@@ -3,6 +3,7 @@ import subprocess
 import shutil
 import datetime
 import shlex
+import config
 from agent import indexer, utils
 
 ALLOWED_COMMANDS = ["pytest", "git", "python", "npm", "node", "make"]
@@ -18,6 +19,9 @@ def read_file(path: str) -> str:
         return f"Error: Path {path} is unsafe or outside project root."
 
     try:
+        if os.path.getsize(path) > config.MAX_FILE_SIZE:
+            return f"Error: File {path} is too large ({os.path.getsize(path)} bytes). Max allowed size is {config.MAX_FILE_SIZE} bytes."
+
         with open(path, "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
